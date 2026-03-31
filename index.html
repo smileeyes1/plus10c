@@ -13,17 +13,18 @@ body {
   text-align: center;
 }
 
-#game-container {
+/* حاوية عامة */
+.box {
   width: 480px;
   margin: 30px auto;
   padding: 25px;
   border-radius: 20px;
-  background: rgba(255,255,255,0.07);
+  background: rgba(255,255,255,0.08);
   box-shadow: 0 0 25px #00eaff;
 }
 
-/* شاشة البداية */
-#start-screen {
+/* شاشات كاملة */
+.screen {
   position: fixed;
   inset: 0;
   background: linear-gradient(#062241, #0a1a2f);
@@ -32,58 +33,24 @@ body {
   justify-content: center;
   align-items: center;
   z-index: 9999;
+  padding: 20px;
 }
 
-#start-screen h1 {
-  font-size: 50px;
-  text-shadow: 0 0 20px #00eaff;
-}
-
-#start-btn {
-  padding: 18px 45px;
-  font-size: 28px;
+button {
+  padding: 14px 35px;
+  font-size: 24px;
   border-radius: 15px;
   background: #00eaff;
   border: none;
   cursor: pointer;
+  margin-top: 20px;
 }
 
-/* البطل */
-#hero {
-  width: 120px;
-  height: 180px;
-  margin: 20px auto;
-  background: #1976ff;
-  border-radius: 20px;
-  animation: float 2s infinite;
+.shapes {
+  font-size: 34px;
+  margin: 10px 0;
 }
 
-@keyframes float {
-  50% { transform: translateY(-10px); }
-}
-
-/* الوحش */
-#monster {
-  font-size: 90px;
-}
-
-/* شريط الطاقة */
-#hp-bar {
-  width: 90%;
-  height: 22px;
-  background: #333;
-  margin: 10px auto;
-  border-radius: 10px;
-}
-
-#hp-inner {
-  height: 100%;
-  background: #4cff8f;
-  width: 100%;
-  transition: 0.3s;
-}
-
-/* عناصر عامة */
 input {
   padding: 10px;
   font-size: 24px;
@@ -92,54 +59,67 @@ input {
   text-align: center;
 }
 
-button {
-  padding: 14px 30px;
-  font-size: 24px;
-  border-radius: 15px;
-  background: #00eaff;
-  border: none;
-  cursor: pointer;
-}
-
 #message {
-  min-height: 34px;
+  min-height: 32px;
   margin-top: 10px;
-  font-size: 22px;
   color: #cdb4db;
+  font-size: 22px;
 }
 </style>
 </head>
 
 <body>
 
-<!-- شاشة البداية -->
-<div id="start-screen">
-  <h1>🦸‍♂️ أسطورة أبطال الأعداد</h1>
-  <button id="start-btn">ابدأ المغامرة</button>
+<!-- شاشة الشرح -->
+<div id="intro" class="screen">
+  <h1>🌱 قبل أن نبدأ</h1>
+
+  <p style="font-size:22px;max-width:500px;">
+    ✅ <strong>العدد</strong> يخبرنا: كم عندنا من الأشياء<br><br>
+    ✅ <strong>الجمع</strong> يعني: نضم الأشياء معًا<br><br>
+    ✅ بعد الضمّ… نعدّ الكل بهدوء
+  </p>
+
+  <div style="margin-top:20px;">
+    <div><strong>ثلاثة</strong> (٣)</div>
+    <div class="shapes">● ● ●</div>
+
+    <div style="margin:10px;">＋</div>
+
+    <div><strong>اثنان</strong> (٢)</div>
+    <div class="shapes">● ●</div>
+
+    <div style="margin-top:10px;">⬇️</div>
+
+    <div><strong>خمسة</strong></div>
+    <div class="shapes">● ● ● ● ●</div>
+  </div>
+
+  <button onclick="startGame()">✅ فهمت – ابدأ المغامرة</button>
 </div>
 
-<div id="game-container">
+<!-- اللعبة -->
+<div id="game" class="box" style="display:none;">
 
-<button onclick="toggleSilent()" id="silentBtn" style="font-size:18px;margin-bottom:10px;">
+<button onclick="toggleSilent()" id="silentBtn" style="font-size:18px;">
 🔊 الوضع العادي
 </button>
 
-<div id="hero"></div>
+<h2 style="color:#00eaff;">🦸‍♂️ أسطورة أبطال الأعداد</h2>
 
-<div style="font-size:26px;color:#00eaff;">
-  المستوى: <span id="level">١</span>
+<div>المستوى: <span id="level">١</span></div>
+<div>النقاط: <span id="score">٠</span></div>
+
+<div style="font-size:80px;margin:10px;">👹</div>
+
+<div style="margin:10px;">
+  طاقة الوحش:
+  <div style="width:90%;height:22px;background:#333;border-radius:10px;margin:auto;">
+    <div id="hpBar" style="height:100%;width:100%;background:#4cff8f;border-radius:10px;"></div>
+  </div>
 </div>
 
-<div style="font-size:22px;">
-  النقاط: <span id="score">٠</span>
-</div>
-
-<div id="monster">👹</div>
-
-<div id="hp-bar"><div id="hp-inner"></div></div>
-طاقة الوحش: <span id="hp">١٠٠</span>%
-
-<div id="question" style="font-size:30px;margin-top:20px;"></div>
+<div id="question" style="margin-top:20px;"></div>
 
 <input type="number" id="answer" placeholder="اكتب الجواب">
 <br>
@@ -150,150 +130,97 @@ button {
 </div>
 
 <script>
-/* ----------- الإعدادات الأساسية ----------- */
-let level = 1;
-let score = 0;
-let monsterHP = 100;
-let monsterMaxHP = 100;
-
-let silentMode = false;
-
-/* التكيف الذكي */
-let successCount = 0;
-let failureCount = 0;
-let thinkingStart = 0;
-let difficulty = "normal";
-
-/* أسماء الأعداد */
-const numberNames = {
+/* ==== بيانات ==== */
+const names = {
   0:"صفر",1:"واحد",2:"اثنان",3:"ثلاثة",4:"أربعة",
   5:"خمسة",6:"ستة",7:"سبعة",8:"ثمانية",9:"تسعة",10:"عشرة"
 };
 
 let x = 1, y = 1;
+let level = 1;
+let score = 0;
+let hp = 100;
+let maxHp = 100;
+let silent = false;
 
-const monsters = ["👹","🐲","👾","👻","🐉"];
+let success = 0;
+let fail = 0;
+let startTime = 0;
 
-/* ----------- أدوات مساعدة ----------- */
-function toArabic(n) {
-  return n.toString().replace(/\d/g, d => "٠١٢٣٤٥٦٧٨٩"[d]);
+/* ==== أدوات ==== */
+function shapes(n){ return "● ".repeat(n); }
+function arabic(n){ return n.toString().replace(/\d/g,d=>"٠١٢٣٤٥٦٧٨٩"[d]); }
+function msg(t,c="#cdb4db"){ message.style.color=c; message.textContent=t; }
+
+function toggleSilent(){
+  silent = !silent;
+  silentBtn.textContent = silent?"🔕 وضع التركيز":"🔊 الوضع العادي";
+  msg(silent?"🧘‍♂️ وضع هادئ":"");
 }
 
-function showMessage(text, color="#cdb4db") {
-  const box = document.getElementById("message");
-  box.style.color = color;
-  box.textContent = text;
+/* ==== بدء ==== */
+function startGame(){
+  intro.style.display="none";
+  game.style.display="block";
+  newQuestion();
 }
 
-/* ----------- الوضع الصامت ----------- */
-function toggleSilent() {
-  silentMode = !silentMode;
-  document.getElementById("silentBtn").textContent =
-    silentMode ? "🔕 الوضع الصامت" : "🔊 الوضع العادي";
-  showMessage(silentMode ? "🧘‍♂️ وضع التركيز مفعّل" : "");
-}
+/* ==== سؤال ذكي ==== */
+function newQuestion(){
+  startTime = Date.now();
 
-/* ----------- الصوت ----------- */
-function playSound(freq) {
-  if (silentMode) return;
-  const ctx = new AudioContext();
-  const osc = ctx.createOscillator();
-  const gain = ctx.createGain();
-  osc.frequency.value = freq;
-  osc.connect(gain);
-  gain.connect(ctx.destination);
-  osc.start();
-  gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.3);
-  osc.stop(ctx.currentTime + 0.3);
-}
-
-/* ----------- الأسئلة الذكية ----------- */
-function newQuestion() {
-  thinkingStart = Date.now();
-
-  if (difficulty === "support") {
-    x = Math.floor(Math.random() * 4) + 1;
-    y = Math.floor(Math.random() * (6 - x + 1));
-  } else if (difficulty === "challenge") {
-    x = Math.floor(Math.random() * 8) + 1;
-    y = Math.floor(Math.random() * (10 - x + 1));
-  } else {
-    x = Math.floor(Math.random() * 6) + 1;
-    y = Math.floor(Math.random() * (10 - x + 1));
+  if(success >= 3){
+    x = Math.floor(Math.random()*8)+1;
+    y = Math.floor(Math.random()*(10-x+1));
+  }else if(fail >= 2){
+    x = Math.floor(Math.random()*4)+1;
+    y = Math.floor(Math.random()*3)+1;
+  }else{
+    x = Math.floor(Math.random()*6)+1;
+    y = Math.floor(Math.random()*(10-x+1));
   }
 
-  document.getElementById("question").innerHTML =
-    `كم يساوي ${numberNames[x]} + ${numberNames[y]} ؟`;
+  question.innerHTML = `
+    <div>
+      <strong>${names[x]}</strong> (${arabic(x)})<br>
+      <div class="shapes">${shapes(x)}</div>
+      <div style="font-size:30px;">＋</div>
+      <strong>${names[y]}</strong> (${arabic(y)})<br>
+      <div class="shapes">${shapes(y)}</div>
+      <div style="margin-top:10px;">كم عدد الأشكال كلها؟</div>
+    </div>
+  `;
 }
 
-/* ----------- تحديث الطاقة ----------- */
-function updateHP() {
-  let p = (monsterHP / monsterMaxHP) * 100;
-  document.getElementById("hp-inner").style.width = p + "%";
-  document.getElementById("hp").textContent = toArabic(Math.round(p));
-}
-
-/* ----------- الهجوم ----------- */
-function attack() {
+/* ==== هجوم ==== */
+function attack(){
   let ans = parseInt(answer.value);
-  if (isNaN(ans)) return;
+  if(isNaN(ans)) return;
 
-  let thinkingTime = Date.now() - thinkingStart;
-
-  if (ans === x + y) {
-    successCount++;
-    failureCount = 0;
-    monsterHP -= 20;
-    score += 10;
-    playSound(600);
-    showMessage("🌟 أحسنت!", "#4cff8f");
-  } else {
-    failureCount++;
-    successCount = 0;
-    monsterHP += 10;
-    if (monsterHP > monsterMaxHP) monsterHP = monsterMaxHP;
-    score = Math.max(0, score - 2);
-    playSound(200);
-    showMessage(`✅ الصحيح هو ${numberNames[x + y]}`, "#ffd166");
+  if(ans === x+y){
+    success++; fail=0;
+    score+=10;
+    hp-=20;
+    msg("🌟 أحسنت!", "#4cff8f");
+  }else{
+    fail++; success=0;
+    score=Math.max(0,score-2);
+    hp=Math.min(maxHp,hp+10);
+    msg("✅ الصحيح هو: "+names[x+y], "#ffd166");
   }
 
-  /* تكيّف المستوى */
-  if (successCount >= 3 && thinkingTime < 4000) difficulty = "challenge";
-  else if (failureCount >= 2) difficulty = "support";
-  else difficulty = "normal";
-
-  if (monsterHP <= 0) winLevel();
-  else newQuestion();
-
-  document.getElementById("score").textContent = toArabic(score);
-  updateHP();
-  answer.value = "";
-}
-
-/* ----------- الفوز بالمستوى ----------- */
-function winLevel() {
-  level++;
-  monsterMaxHP += 15;
-  monsterHP = monsterMaxHP;
-  document.getElementById("level").textContent = toArabic(level);
-  document.getElementById("monster").textContent =
-    monsters[(level - 1) % monsters.length];
-  showMessage("🏆 مستوى جديد!", "#00eaff");
-
-  if (level % 5 === 0) {
-    showMessage("👏 حافظت على تركيزك! ممتاز!", "#90dbf4");
+  if(hp<=0){
+    level++;
+    hp=maxHp;
+    msg("🏆 مستوى جديد!", "#00eaff");
   }
 
+  levelSpan.textContent = arabic(level);
+  scoreSpan.textContent = arabic(score);
+  hpBar.style.width = (hp/maxHp*100)+"%";
+  answer.value="";
   newQuestion();
-  updateHP();
 }
-
-/* ----------- البدء ----------- */
-document.getElementById("start-btn").onclick = () => {
-  document.getElementById("start-screen").style.display = "none";
-  newQuestion();
-  updateHP();
-};
 </script>
 
 </body>
