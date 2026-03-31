@@ -51,12 +51,13 @@ input{
 }
 
 .math{font-size:26px;margin:8px 0;color:#ffe066}
-#msg{min-height:70px;white-space:pre-line}
+#msg{min-height:80px;white-space:pre-line}
 
 .soft{background:#ffd166;color:#000}
 .star{background:#ffe066;color:#000}
+.next{background:#06d6a0;color:#000}
 
-/* ❤️ القلوب النابضة */
+/* ❤️ القلوب */
 .hearts{
   font-size:36px;
   margin:6px 0;
@@ -88,22 +89,24 @@ input{
 </div>
 
 <div id="game" class="box" style="display:none">
-<h2>🦸‍♂️ أسطورة أبطال الأعداد</h2>
+  <h2>🦸‍♂️ أسطورة أبطال الأعداد</h2>
 
-<div>المستوى: <span id="level">١</span></div>
-<div>النقاط: <span id="score">٠</span></div>
+  <div>المستوى: <span id="level">١</span></div>
+  <div>النقاط: <span id="score">٠</span></div>
 
-<div id="question"></div>
+  <div id="question"></div>
 
-<input id="answer" type="number" placeholder="اكتب الجواب">
-<br>
-<button onclick="attack()">⚡ أجيب</button>
-<br>
+  <input id="answer" type="number" placeholder="اكتب الجواب">
+  <br>
+  <button onclick="attack()">⚡ أجيب</button>
+  <br>
 
-<button id="rethinkBtn" class="soft" style="display:none" onclick="smartHint()">🔄 أفهم بهدوء</button>
-<button id="starBtn" class="star" style="display:none" onclick="giveStar()">⭐ نجمة للدفتر</button>
+  <button id="rethinkBtn" class="soft" style="display:none" onclick="smartHint()">🔄 أفهم بهدوء</button>
+  <button id="starBtn" class="star" style="display:none" onclick="giveStar()">⭐ نجمة للدفتر</button>
+  <br>
+  <button id="nextBtn" class="next" style="display:none" onclick="nextAfterMistake()">✅ فهمت، نكمل</button>
 
-<div id="msg"></div>
+  <div id="msg"></div>
 </div>
 
 <script>
@@ -111,7 +114,6 @@ const intro=document.getElementById("intro");
 const game=document.getElementById("game");
 const question=document.getElementById("question");
 const answer=document.getElementById("answer");
-const levelSpan=document.getElementById("level");
 const scoreSpan=document.getElementById("score");
 
 const names={
@@ -119,18 +121,15 @@ const names={
 5:"خمسة",6:"ستة",7:"سبعة",8:"ثمانية",9:"تسعة",10:"عشرة"
 };
 
-let x=1,y=1,level=1,score=0;
+let x=1,y=1,score=0;
 
 function arabic(n){
   return n.toString().replace(/\d/g,d=>"٠١٢٣٤٥٦٧٨٩"[d])
 }
 
-/* ❤️ توليد القلوب */
 function hearts(n){
   let h="";
-  for(let i=0;i<n;i++){
-    h+="<span>❤️</span> ";
-  }
+  for(let i=0;i<n;i++) h+="<span>❤️</span> ";
   return h;
 }
 
@@ -147,6 +146,8 @@ function startGame(){
 function newQuestion(){
   document.getElementById("rethinkBtn").style.display="none";
   document.getElementById("starBtn").style.display="none";
+  document.getElementById("nextBtn").style.display="none";
+  msg("");
 
   x=Math.floor(Math.random()*6)+1;
   y=Math.floor(Math.random()*(10-x+1));
@@ -167,20 +168,9 @@ function newQuestion(){
 }
 
 function smartHint(){
-  msg(
-    "🤍 لا بأس\n"+
-    "نعد القلوب الأولى\n"+
-    "ثم نكمل بالقلوب الثانية\n\n"+
-    "✍️ سجل ⭐ نجمة في دفترك"
-  );
-
   question.innerHTML=`
-    ${names[x]} (${arabic(x)})
-    <div class="hearts">${hearts(x)}</div>
-    +
-    ${names[y]} (${arabic(y)})
-    <div class="hearts">${hearts(y)}</div>
-
+    <div>نعد القلوب بهدوء ❤️</div>
+    <div class="hearts">${hearts(x+y)}</div>
     <div class="math">
       ${arabic(x)} + ${arabic(y)} = <b>${arabic(x+y)}</b>
     </div>
@@ -188,26 +178,39 @@ function smartHint(){
 }
 
 function giveStar(){
-  msg("⭐ أحسنت! تسجيل النجمة دليل أنك تتعلم بجد ✍️");
+  msg("⭐ أحسنت! تسجيل النجمة دليل أنك تحاول وتتعلّم ✍️");
 }
 
 function attack(){
   const ans=parseInt(answer.value);
-  if(isNaN(ans))return;
+  if(isNaN(ans)) return;
 
   if(ans===x+y){
     score+=10;
-    msg("🌟 إجابة صحيحة!");
+    msg("🌟 إجابة صحيحة! أحسنت");
     document.getElementById("starBtn").style.display="inline-block";
+    scoreSpan.textContent=arabic(score);
+
+    answer.value="";
+    setTimeout(newQuestion,1200);
+
   }else{
     smartHint();
+    msg(
+      "🤍 لا بأس\n" +
+      "خذ وقتك وعدّ القلوب بهدوء\n" +
+      "ثم اضغط ✅ فهمت"
+    );
+
     document.getElementById("rethinkBtn").style.display="inline-block";
     document.getElementById("starBtn").style.display="inline-block";
+    document.getElementById("nextBtn").style.display="inline-block";
+    answer.value="";
   }
+}
 
-  scoreSpan.textContent=arabic(score);
-  answer.value="";
-  setTimeout(newQuestion,1500);
+function nextAfterMistake(){
+  newQuestion();
 }
 </script>
 
