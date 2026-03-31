@@ -57,7 +57,6 @@ input{
 .star{background:#ffe066;color:#000}
 .next{background:#06d6a0;color:#000}
 
-/* ❤️ القلوب */
 .hearts{
   font-size:36px;
   margin:6px 0;
@@ -91,7 +90,6 @@ input{
 <div id="game" class="box" style="display:none">
   <h2>🦸‍♂️ أسطورة أبطال الأعداد</h2>
 
-  <div>المستوى: <span id="level">١</span></div>
   <div>النقاط: <span id="score">٠</span></div>
 
   <div id="question"></div>
@@ -102,29 +100,31 @@ input{
   <br>
 
   <button id="rethinkBtn" class="soft" style="display:none" onclick="smartHint()">🔄 أفهم بهدوء</button>
-  <button id="starBtn" class="star" style="display:none" onclick="giveStar()">⭐ نجمة للدفتر</button>
+  <button id="starBtn" class="star" style="display:none" onclick="giveStar()">⭐ نجمة تعلّم</button>
   <br>
-  <button id="nextBtn" class="next" style="display:none" onclick="nextAfterMistake()">✅ فهمت، نكمل</button>
+  <button id="nextBtn" class="next" style="display:none" onclick="nextAfterMistake()">✅ نكمل</button>
 
   <div id="msg"></div>
 </div>
 
 <script>
-const intro=document.getElementById("intro");
-const game=document.getElementById("game");
-const question=document.getElementById("question");
-const answer=document.getElementById("answer");
-const scoreSpan=document.getElementById("score");
+const intro = document.getElementById("intro");
+const game = document.getElementById("game");
+const question = document.getElementById("question");
+const answer = document.getElementById("answer");
+const scoreSpan = document.getElementById("score");
 
-const names={
-0:"صفر",1:"واحد",2:"اثنان",3:"ثلاثة",4:"أربعة",
-5:"خمسة",6:"ستة",7:"سبعة",8:"ثمانية",9:"تسعة",10:"عشرة"
+const names = {
+  0:"صفر",1:"واحد",2:"اثنان",3:"ثلاثة",4:"أربعة",
+  5:"خمسة",6:"ستة",7:"سبعة",8:"ثمانية",9:"تسعة",10:"عشرة"
 };
 
 let x=1,y=1,score=0;
+let streak = 0;        // إجابات صحيحة متتالية
+let hadMistake = false;
 
 function arabic(n){
-  return n.toString().replace(/\d/g,d=>"٠١٢٣٤٥٦٧٨٩"[d])
+  return n.toString().replace(/\d/g,d=>"٠١٢٣٤٥٦٧٨٩"[d]);
 }
 
 function hearts(n){
@@ -134,7 +134,7 @@ function hearts(n){
 }
 
 function msg(t){
-  document.getElementById("msg").textContent=t;
+  document.getElementById("msg").textContent = t;
 }
 
 function startGame(){
@@ -144,31 +144,28 @@ function startGame(){
 }
 
 function newQuestion(){
-  document.getElementById("rethinkBtn").style.display="none";
-  document.getElementById("starBtn").style.display="none";
-  document.getElementById("nextBtn").style.display="none";
+  rethinkBtn.style.display="none";
+  starBtn.style.display="none";
+  nextBtn.style.display="none";
   msg("");
 
-  x=Math.floor(Math.random()*6)+1;
-  y=Math.floor(Math.random()*(10-x+1));
+  x = Math.floor(Math.random()*6)+1;
+  y = Math.floor(Math.random()*(10-x+1));
 
-  question.innerHTML=`
+  question.innerHTML = `
     <b>${names[x]}</b> (${arabic(x)})
     <div class="hearts">${hearts(x)}</div>
     +
     <b>${names[y]}</b> (${arabic(y)})
     <div class="hearts">${hearts(y)}</div>
 
-    <div class="math">
-      ${arabic(x)} + ${arabic(y)} = ؟
-    </div>
-
+    <div class="math">${arabic(x)} + ${arabic(y)} = ؟</div>
     <div>كم المجموع؟</div>
   `;
 }
 
 function smartHint(){
-  question.innerHTML=`
+  question.innerHTML = `
     <div>نعد القلوب بهدوء ❤️</div>
     <div class="hearts">${hearts(x+y)}</div>
     <div class="math">
@@ -178,33 +175,46 @@ function smartHint(){
 }
 
 function giveStar(){
-  msg("⭐ أحسنت! تسجيل النجمة دليل أنك تحاول وتتعلّم ✍️");
+  msg("⭐ هذه النجمة لأنك فكّرت وتعلّمت، وليس فقط لأنك أجبت ✍️");
+  starBtn.style.display="none";
 }
 
 function attack(){
-  const ans=parseInt(answer.value);
+  const ans = parseInt(answer.value);
   if(isNaN(ans)) return;
 
-  if(ans===x+y){
-    score+=10;
-    msg("🌟 إجابة صحيحة! أحسنت");
-    document.getElementById("starBtn").style.display="inline-block";
-    scoreSpan.textContent=arabic(score);
+  if(ans === x+y){
+    score += 10;
+    streak++;
 
+    if(hadMistake || streak === 3){
+      starBtn.style.display="inline-block";
+
+      if(hadMistake){
+        msg("🌱 أحسنت! تعلّمت من الخطأ ⭐");
+      }else{
+        msg("🏆 تركيز رائع ثلاث مرات متتالية ⭐");
+      }
+
+      hadMistake = false;
+      streak = 0;
+    }else{
+      msg("✅ إجابة صحيحة، واصل التفكير 👌");
+    }
+
+    scoreSpan.textContent = arabic(score);
     answer.value="";
     setTimeout(newQuestion,1200);
 
   }else{
-    smartHint();
-    msg(
-      "🤍 لا بأس\n" +
-      "خذ وقتك وعدّ القلوب بهدوء\n" +
-      "ثم اضغط ✅ فهمت"
-    );
+    hadMistake = true;
+    streak = 0;
 
-    document.getElementById("rethinkBtn").style.display="inline-block";
-    document.getElementById("starBtn").style.display="inline-block";
-    document.getElementById("nextBtn").style.display="inline-block";
+    smartHint();
+    msg("🤍 الخطأ خطوة مهمّة\nعدّ القلوب بهدوء ثم نكمل");
+
+    rethinkBtn.style.display="inline-block";
+    nextBtn.style.display="inline-block";
     answer.value="";
   }
 }
