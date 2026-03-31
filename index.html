@@ -52,7 +52,7 @@ input{
 }
 
 .shapes{font-size:32px;margin:5px 0}
-#msg{min-height:34px;font-size:22px;margin-top:10px}
+#msg{min-height:60px;font-size:20px;margin-top:10px;white-space:pre-line}
 
 .soft{background:#ffd166;color:#000}
 .star{background:#ffe066;color:#000}
@@ -62,7 +62,7 @@ input{
 
 <body>
 
-<!-- تمهيد -->
+<!-- المقدمة -->
 <div id="intro" class="fullscreen">
   <h1>🌱 قبل أن نبدأ</h1>
   <p style="font-size:22px;max-width:500px;">
@@ -107,16 +107,15 @@ input{
 <input id="answer" type="number" placeholder="اكتب الجواب"><br>
 <button onclick="attack()">⚡ أجيب</button><br>
 
-<button id="hintBtn" class="soft" style="display:none" onclick="hint()">💡 تلميح صغير</button>
 <button id="rethinkBtn" class="soft" style="display:none" onclick="reExplain()">🔄 أريد أن أفهم بهدوء</button>
 <button id="noShapesBtn" class="gray" style="display:none" onclick="toggleShapes()">🌱 بدون الأشكال</button>
-<button id="starBtn" class="star" style="display:none" onclick="giveStar()">⭐ استحققت نجمة</button>
+<button id="starBtn" class="star" style="display:none" onclick="giveStar()">⭐ نجمة للدفتر</button>
 
 <div id="msg"></div>
 </div>
 
 <script>
-/* ===== ربط العناصر ===== */
+/* ===== العناصر ===== */
 const intro=document.getElementById("intro");
 const game=document.getElementById("game");
 const question=document.getElementById("question");
@@ -171,47 +170,47 @@ function startGame(){
 
 /* ===== سؤال ===== */
 function newQuestion(){
-  document.getElementById("hintBtn").style.display="none";
   document.getElementById("rethinkBtn").style.display="none";
   document.getElementById("starBtn").style.display="none";
 
-  if(success>=3){
-    document.getElementById("noShapesBtn").style.display="inline-block";
-    x=Math.floor(Math.random()*8)+1;
-    y=Math.floor(Math.random()*(10-x+1));
-  }else{
-    document.getElementById("noShapesBtn").style.display="none";
-    x=Math.floor(Math.random()*6)+1;
-    y=Math.floor(Math.random()*(10-x+1));
-  }
+  x=Math.floor(Math.random()*6)+1;
+  y=Math.floor(Math.random()*(10-x+1));
 
   question.innerHTML=`
-  <b>${names[x]}</b> (${arabic(x)})<div class="shapes">${shapes(x)}</div>
+  <b>${names[x]}</b><div class="shapes">${shapes(x)}</div>
   +
-  <b>${names[y]}</b> (${arabic(y)})<div class="shapes">${shapes(y)}</div>
+  <b>${names[y]}</b><div class="shapes">${shapes(y)}</div>
   <div>كم عدد الأشكال كلها؟</div>`;
 }
 
-/* ===== تلميح ===== */
-function hint(){
-  msg("💡 ضمّ الأشكال ثم عدّها بهدوء","#ffd166");
-}
+/* ===== تلميح ذكي عند الخطأ ===== */
+function smartHint(){
+  msg(
+    "🤍 لا تقلق، الخطأ يساعدنا نتعلم\n"+
+    "🔹 الجمع يعني أن نضم العددين معًا\n"+
+    "🔹 نعد الأول ثم نكمل العد بالثاني\n\n"+
+    "✍️ الآن سجّل ⭐ نجمة في دفترك لأنك حاولت",
+    "#ffd166"
+  );
 
-/* ===== إعادة شرح ===== */
-function reExplain(){
   question.innerHTML=`
   ${names[x]}<div class="shapes">${"● ".repeat(x)}</div>
   +
   ${names[y]}<div class="shapes">${"● ".repeat(y)}</div>
-  <div><b>المجموع هو ${names[x+y]}</b></div>`;
+  <div><b>المجموع = ${arabic(x+y)}</b></div>`;
+}
+
+/* ===== إعادة شرح ===== */
+function reExplain(){
+  smartHint();
 }
 
 /* ===== نجمة ===== */
 function giveStar(){
-  msg("⭐ رائع! فخور بنفسك","#ffd166");
+  msg("⭐ أحسنت! تسجيلك للنجمة يعني أنك تتعلم بصدق ✍️","#ffe066");
 }
 
-/* ===== هجوم ===== */
+/* ===== الهجوم ===== */
 function attack(){
   const ans=parseInt(answer.value);
   if(isNaN(ans))return;
@@ -220,15 +219,15 @@ function attack(){
     success++;fail=0;
     if(!training)score+=10;
     hpValue-=20;
-    msg("🌟 أحسنت!","#4cff8f");
-    if(success>=3)document.getElementById("starBtn").style.display="inline-block";
+    msg("🌟 رائع! إجابة صحيحة","#4cff8f");
+    document.getElementById("starBtn").style.display="inline-block";
   }else{
     fail++;success=0;
     if(!training)score=Math.max(0,score-2);
     hpValue=Math.min(maxHp,hpValue+10);
-    msg("✅ لا بأس، الصحيح هو "+names[x+y],"#ffd166");
-    document.getElementById("hintBtn").style.display="inline-block";
+    smartHint();
     document.getElementById("rethinkBtn").style.display="inline-block";
+    document.getElementById("starBtn").style.display="inline-block";
   }
 
   if(hpValue<=0){
