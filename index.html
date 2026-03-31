@@ -13,8 +13,7 @@ body {
   text-align: center;
 }
 
-/* حاوية عامة */
-.box {
+.screen, .box {
   width: 480px;
   margin: 30px auto;
   padding: 25px;
@@ -23,76 +22,66 @@ body {
   box-shadow: 0 0 25px #00eaff;
 }
 
-/* شاشات كاملة */
-.screen {
+.fullscreen {
   position: fixed;
   inset: 0;
-  background: linear-gradient(#062241, #0a1a2f);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-  padding: 20px;
+  background: linear-gradient(#062241,#0a1a2f);
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  z-index:9999;
 }
 
 button {
-  padding: 14px 35px;
-  font-size: 24px;
-  border-radius: 15px;
-  background: #00eaff;
-  border: none;
-  cursor: pointer;
-  margin-top: 20px;
-}
-
-.shapes {
-  font-size: 34px;
-  margin: 10px 0;
+  padding: 12px 30px;
+  font-size: 20px;
+  border-radius: 14px;
+  background:#00eaff;
+  border:none;
+  cursor:pointer;
+  margin:6px;
 }
 
 input {
-  padding: 10px;
-  font-size: 24px;
-  border-radius: 10px;
-  width: 200px;
-  text-align: center;
+  font-size:22px;
+  padding:10px;
+  width:200px;
+  border-radius:10px;
+  text-align:center;
 }
 
-#message {
-  min-height: 32px;
-  margin-top: 10px;
-  color: #cdb4db;
-  font-size: 22px;
-}
+.shapes { font-size:32px; margin:5px 0; }
+#msg { min-height:34px; font-size:22px; margin-top:10px; }
+
+.soft { background:#ffd166; color:#000; }
+.star { background:#ffe066; color:#000; }
+.gray { background:#adb5bd; color:#000; }
+
 </style>
 </head>
 
 <body>
 
-<!-- شاشة الشرح -->
-<div id="intro" class="screen">
+<!-- التمهيد المفاهيمي -->
+<div id="intro" class="fullscreen">
   <h1>🌱 قبل أن نبدأ</h1>
 
   <p style="font-size:22px;max-width:500px;">
-    ✅ <strong>العدد</strong> يخبرنا: كم عندنا من الأشياء<br><br>
-    ✅ <strong>الجمع</strong> يعني: نضم الأشياء معًا<br><br>
+    ✅ <b>العدد</b>: يخبرنا كم عندنا من الأشياء<br><br>
+    ✅ <b>الجمع</b>: يعني نضم الأشياء معًا<br><br>
     ✅ بعد الضمّ… نعدّ الكل بهدوء
   </p>
 
-  <div style="margin-top:20px;">
-    <div><strong>ثلاثة</strong> (٣)</div>
+  <div>
+    ثلاثة (٣)
     <div class="shapes">● ● ●</div>
-
-    <div style="margin:10px;">＋</div>
-
-    <div><strong>اثنان</strong> (٢)</div>
+    +
+    اثنان (٢)
     <div class="shapes">● ●</div>
-
-    <div style="margin-top:10px;">⬇️</div>
-
-    <div><strong>خمسة</strong></div>
+    =
     <div class="shapes">● ● ● ● ●</div>
+    خمسة
   </div>
 
   <button onclick="startGame()">✅ فهمت – ابدأ المغامرة</button>
@@ -101,125 +90,159 @@ input {
 <!-- اللعبة -->
 <div id="game" class="box" style="display:none;">
 
-<button onclick="toggleSilent()" id="silentBtn" style="font-size:18px;">
-🔊 الوضع العادي
-</button>
+<h2>🦸‍♂️ أسطورة أبطال الأعداد</h2>
 
-<h2 style="color:#00eaff;">🦸‍♂️ أسطورة أبطال الأعداد</h2>
+<button onclick="toggleSilent()" id="silentBtn">🔊 الوضع العادي</button>
+<button onclick="toggleTraining()" id="trainBtn" class="gray">🧘‍♂️ تدريب بلا نقاط</button>
 
 <div>المستوى: <span id="level">١</span></div>
-<div>النقاط: <span id="score">٠</span></div>
+<div id="scoreBox">النقاط: <span id="score">٠</span></div>
 
-<div style="font-size:80px;margin:10px;">👹</div>
+<div style="font-size:70px">👹</div>
 
-<div style="margin:10px;">
-  طاقة الوحش:
-  <div style="width:90%;height:22px;background:#333;border-radius:10px;margin:auto;">
-    <div id="hpBar" style="height:100%;width:100%;background:#4cff8f;border-radius:10px;"></div>
-  </div>
+<div style="width:90%;height:20px;background:#333;border-radius:10px;margin:10px auto;">
+  <div id="hp" style="height:100%;width:100%;background:#4cff8f;border-radius:10px;"></div>
 </div>
 
-<div id="question" style="margin-top:20px;"></div>
+<div id="question"></div>
 
-<input type="number" id="answer" placeholder="اكتب الجواب">
+<input id="answer" type="number" placeholder="اكتب الجواب">
 <br>
-<button onclick="attack()">هجوم ⚡</button>
 
-<div id="message"></div>
+<button onclick="attack()">⚡ أجيب</button>
+<br>
+
+<button id="hintBtn" onclick="hint()" class="soft" style="display:none;">💡 تلميح صغير</button>
+<button id="rethinkBtn" onclick="reExplain()" class="soft" style="display:none;">🔄 أريد أن أفهم بهدوء</button>
+<button id="noShapesBtn" onclick="toggleShapes()" class="gray" style="display:none;">
+🌱 هل تحب أن تحاول بدون الأشكال؟
+</button>
+<button id="starBtn" onclick="giveStar()" class="star" style="display:none;">
+⭐ استحققتُ نجمة – سأكتبها في دفتري
+</button>
+
+<div id="msg"></div>
 
 </div>
 
 <script>
-/* ==== بيانات ==== */
-const names = {
-  0:"صفر",1:"واحد",2:"اثنان",3:"ثلاثة",4:"أربعة",
-  5:"خمسة",6:"ستة",7:"سبعة",8:"ثمانية",9:"تسعة",10:"عشرة"
+/* ===== البيانات الأساسية ===== */
+const names={
+0:"صفر",1:"واحد",2:"اثنان",3:"ثلاثة",4:"أربعة",
+5:"خمسة",6:"ستة",7:"سبعة",8:"ثمانية",9:"تسعة",10:"عشرة"
 };
 
-let x = 1, y = 1;
-let level = 1;
-let score = 0;
-let hp = 100;
-let maxHp = 100;
-let silent = false;
+let x=1,y=1;
+let level=1, score=0;
+let hp=100,maxHp=100;
+let success=0, fail=0;
+let silent=false, training=false;
+let showShapes=true;
 
-let success = 0;
-let fail = 0;
-let startTime = 0;
+/* ===== أدوات ===== */
+function shapes(n){ return showShapes?"● ".repeat(n):""; }
+function arabic(n){return n.toString().replace(/\d/g,d=>"٠١٢٣٤٥٦٧٨٩"[d]);}
+function msg(t,c="#cdb4db"){document.getElementById("msg").style.color=c;document.getElementById("msg").textContent=t;}
 
-/* ==== أدوات ==== */
-function shapes(n){ return "● ".repeat(n); }
-function arabic(n){ return n.toString().replace(/\d/g,d=>"٠١٢٣٤٥٦٧٨٩"[d]); }
-function msg(t,c="#cdb4db"){ message.style.color=c; message.textContent=t; }
-
+/* ===== أوضاع ===== */
 function toggleSilent(){
-  silent = !silent;
-  silentBtn.textContent = silent?"🔕 وضع التركيز":"🔊 الوضع العادي";
-  msg(silent?"🧘‍♂️ وضع هادئ":"");
+ silent=!silent;
+ silentBtn.textContent=silent?"🔕 وضع التركيز":"🔊 الوضع العادي";
+ msg(silent?"🧘‍♂️ هدوء وتركيز":"");
 }
 
-/* ==== بدء ==== */
+function toggleTraining(){
+ training=!training;
+ trainBtn.textContent=training?"🧘‍♂️ تدريب بلا نقاط ✓":"🧘‍♂️ تدريب بلا نقاط";
+ scoreBox.style.display=training?"none":"block";
+ msg(training?"🌱 نتعلم بهدوء بلا نقاط":"");
+}
+
+function toggleShapes(){
+ showShapes=!showShapes;
+ noShapesBtn.textContent=showShapes?
+"🌱 هل تحب أن تحاول بدون الأشكال؟":"✅ الأشكال عادت";
+ newQuestion();
+}
+
+/* ===== بدء ===== */
 function startGame(){
-  intro.style.display="none";
-  game.style.display="block";
-  newQuestion();
+ intro.style.display="none";
+ game.style.display="block";
+ newQuestion();
 }
 
-/* ==== سؤال ذكي ==== */
+/* ===== سؤال ===== */
 function newQuestion(){
-  startTime = Date.now();
+ hintBtn.style.display="none";
+ rethinkBtn.style.display="none";
 
-  if(success >= 3){
-    x = Math.floor(Math.random()*8)+1;
-    y = Math.floor(Math.random()*(10-x+1));
-  }else if(fail >= 2){
-    x = Math.floor(Math.random()*4)+1;
-    y = Math.floor(Math.random()*3)+1;
-  }else{
-    x = Math.floor(Math.random()*6)+1;
-    y = Math.floor(Math.random()*(10-x+1));
-  }
+ if(success>=3) noShapesBtn.style.display="inline-block";
+ else noShapesBtn.style.display="none";
 
-  question.innerHTML = `
-    <div>
-      <strong>${names[x]}</strong> (${arabic(x)})<br>
-      <div class="shapes">${shapes(x)}</div>
-      <div style="font-size:30px;">＋</div>
-      <strong>${names[y]}</strong> (${arabic(y)})<br>
-      <div class="shapes">${shapes(y)}</div>
-      <div style="margin-top:10px;">كم عدد الأشكال كلها؟</div>
-    </div>
-  `;
+ if(success>=3){x=Math.random()*8|0+1;y=Math.random()*(10-x+1)|0;}
+ else if(fail>=2){x=Math.random()*3|0+1;y=Math.random()*3|0+1;}
+ else{x=Math.random()*6|0+1;y=Math.random()*(10-x+1)|0;}
+
+ question.innerHTML=`
+ <b>${names[x]}</b> (${arabic(x)})<div class="shapes">${shapes(x)}</div>
+ +
+ <b>${names[y]}</b> (${arabic(y)})<div class="shapes">${shapes(y)}</div>
+ <div>كم عدد الأشكال كلها؟</div>`;
 }
 
-/* ==== هجوم ==== */
+/* ===== تلميح ===== */
+function hint(){
+ msg("💡 جرّب أن تضمّ الأشكال ثم تعدّها بهدوء","#ffd166");
+ hintBtn.style.display="none";
+}
+
+/* ===== إعادة فهم ===== */
+function reExplain(){
+ question.innerHTML=`
+ ${names[x]} <div class="shapes">${"● ".repeat(x)}</div>
+ +
+ ${names[y]} <div class="shapes">${"● ".repeat(y)}</div>
+ <div>نضمّ… ثم نعدّ الكل</div>
+ <b>العدد الصحيح: ${names[x+y]}</b>`;
+}
+
+/* ===== نجمة ===== */
+function giveStar(){
+ msg("⭐ رائع! أنت فخور بنفسك","#ffd166");
+ starBtn.style.display="none";
+}
+
+/* ===== هجوم ===== */
 function attack(){
-  let ans = parseInt(answer.value);
-  if(isNaN(ans)) return;
+ let ans=parseInt(answer.value);
+ if(isNaN(ans))return;
 
-  if(ans === x+y){
-    success++; fail=0;
-    score+=10;
-    hp-=20;
-    msg("🌟 أحسنت!", "#4cff8f");
-  }else{
-    fail++; success=0;
-    score=Math.max(0,score-2);
-    hp=Math.min(maxHp,hp+10);
-    msg("✅ الصحيح هو: "+names[x+y], "#ffd166");
-  }
+ if(ans===x+y){
+ success++;fail=0;
+ if(!training)score+=10;
+ hp-=20;
+ msg("🌟 أحسنت!","#4cff8f");
+ if(success>=3)starBtn.style.display="inline-block";
+ }else{
+ fail++;success=0;
+ if(!training)score=Math.max(0,score-2);
+ hp=Math.min(maxHp,hp+10);
+ msg("✅ لا بأس، الصحيح هو "+names[x+y],"#ffd166");
+ hintBtn.style.display="inline-block";
+ rethinkBtn.style.display="inline-block";
+ }
 
-  if(hp<=0){
-    level++;
-    hp=maxHp;
-    msg("🏆 مستوى جديد!", "#00eaff");
-  }
+ if(hp<=0){
+ level++;hp=maxHp;
+ msg("🏆 مستوى جديد!","#00eaff");
+ }
 
-  levelSpan.textContent = arabic(level);
-  scoreSpan.textContent = arabic(score);
-  hpBar.style.width = (hp/maxHp*100)+"%";
-  answer.value="";
-  newQuestion();
+ levelSpan.textContent=arabic(level);
+ scoreSpan.textContent=arabic(score);
+ hp.style.width=(hp/maxHp*100)+"%";
+ answer.value="";
+ newQuestion();
 }
 </script>
 
