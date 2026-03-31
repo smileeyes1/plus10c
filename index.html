@@ -51,7 +51,7 @@ input{
 }
 
 .math{font-size:26px;margin:8px 0;color:#ffe066}
-#msg{min-height:80px;white-space:pre-line}
+#msg{min-height:90px;white-space:pre-line;font-size:20px}
 
 .soft{background:#ffd166;color:#000}
 .star{background:#ffe066;color:#000}
@@ -113,6 +113,9 @@ const game = document.getElementById("game");
 const question = document.getElementById("question");
 const answer = document.getElementById("answer");
 const scoreSpan = document.getElementById("score");
+const rethinkBtn = document.getElementById("rethinkBtn");
+const starBtn = document.getElementById("starBtn");
+const nextBtn = document.getElementById("nextBtn");
 
 const names = {
   0:"صفر",1:"واحد",2:"اثنان",3:"ثلاثة",4:"أربعة",
@@ -120,8 +123,8 @@ const names = {
 };
 
 let x=1,y=1,score=0;
-let streak = 0;        // إجابات صحيحة متتالية
-let hadMistake = false;
+let streak=0;
+let hadMistake=false;
 
 function arabic(n){
   return n.toString().replace(/\d/g,d=>"٠١٢٣٤٥٦٧٨٩"[d]);
@@ -134,7 +137,7 @@ function hearts(n){
 }
 
 function msg(t){
-  document.getElementById("msg").textContent = t;
+  document.getElementById("msg").textContent=t;
 }
 
 function startGame(){
@@ -147,12 +150,11 @@ function newQuestion(){
   rethinkBtn.style.display="none";
   starBtn.style.display="none";
   nextBtn.style.display="none";
-  msg("");
 
-  x = Math.floor(Math.random()*6)+1;
-  y = Math.floor(Math.random()*(10-x+1));
+  x=Math.floor(Math.random()*6)+1;
+  y=Math.floor(Math.random()*(10-x+1));
 
-  question.innerHTML = `
+  question.innerHTML=`
     <b>${names[x]}</b> (${arabic(x)})
     <div class="hearts">${hearts(x)}</div>
     +
@@ -165,8 +167,8 @@ function newQuestion(){
 }
 
 function smartHint(){
-  question.innerHTML = `
-    <div>نعد القلوب بهدوء ❤️</div>
+  question.innerHTML=`
+    <div>نعدّ القلوب بهدوء ❤️</div>
     <div class="hearts">${hearts(x+y)}</div>
     <div class="math">
       ${arabic(x)} + ${arabic(y)} = <b>${arabic(x+y)}</b>
@@ -175,51 +177,49 @@ function smartHint(){
 }
 
 function giveStar(){
-  msg("⭐ هذه النجمة لأنك فكّرت وتعلّمت، وليس فقط لأنك أجبت ✍️");
-  starBtn.style.display="none";
+  msg("⭐ نجمة تعلّم!\nاكتب نجمة ⭐ على دفترك ✍️\nلأنك فكّرت وتعلّمت 🌱");
 }
 
 function attack(){
-  const ans = parseInt(answer.value);
+  const ans=parseInt(answer.value);
   if(isNaN(ans)) return;
 
-  if(ans === x+y){
-    score += 10;
+  if(ans===x+y){
+    score+=10;
     streak++;
 
-    if(hadMistake || streak === 3){
+    scoreSpan.textContent=arabic(score);
+    answer.value="";
+
+    if(hadMistake || streak===3){
       starBtn.style.display="inline-block";
 
       if(hadMistake){
-        msg("🌱 أحسنت! تعلّمت من الخطأ ⭐");
-      }else{
-        msg("🏆 تركيز رائع ثلاث مرات متتالية ⭐");
+        msg("🌱 أحسنت!\nتعلمت من الخطأ\nاضغط ⭐ لنجمة التعلّم");
+      } else {
+        msg("🏆 تركيز رائع!\nثلاث إجابات صحيحة\nاضغط ⭐");
       }
 
-      hadMistake = false;
-      streak = 0;
-    }else{
-      msg("✅ إجابة صحيحة، واصل التفكير 👌");
+      hadMistake=false;
+      streak=0;
+    } else {
+      msg("✅ إجابة صحيحة 👌");
+      setTimeout(newQuestion,1200);
     }
-
-    scoreSpan.textContent = arabic(score);
-    answer.value="";
-    setTimeout(newQuestion,1200);
-
-  }else{
-    hadMistake = true;
-    streak = 0;
-
+  } else {
+    hadMistake=true;
+    streak=0;
     smartHint();
-    msg("🤍 الخطأ خطوة مهمّة\nعدّ القلوب بهدوء ثم نكمل");
-
     rethinkBtn.style.display="inline-block";
     nextBtn.style.display="inline-block";
+    msg("🤍 الخطأ خطوة للتعلّم\nعدّ القلوب بهدوء ثم نكمل");
     answer.value="";
   }
 }
 
 function nextAfterMistake(){
+  msg("");
+  starBtn.style.display="none";
   newQuestion();
 }
 </script>
